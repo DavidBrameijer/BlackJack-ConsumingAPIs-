@@ -2,6 +2,20 @@ using BlackJack.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        policy =>
+        {
+            //replace localhost with yours
+            //also add your deployed website
+            policy.WithOrigins("http://localhost:4200",
+                               "https://dinosaur-lore-store.com")
+                .AllowAnyMethod().AllowAnyHeader();
+        });
+});
+
 // Add services to the container.
 builder.Services.AddHttpClient<DeckService>();
 
@@ -24,5 +38,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// CORS
+app.UseCors();
 
 app.Run();

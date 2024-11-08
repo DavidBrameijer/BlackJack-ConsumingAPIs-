@@ -43,11 +43,11 @@ namespace BlackJack.Controllers
             GameStatus status;
             if (gameId != null)
             {
-            status = allGames.FirstOrDefault(g => g.id == gameId);
-            if (status.GameOver == false && status.DeckId != null)
-            {
-                return Conflict("Game in progress.");
-            }
+                status = allGames.FirstOrDefault(g => g.id == gameId);
+                if (status.GameOver == false && status.DeckId != null)
+                {
+                    return Conflict("Game in progress.");
+                }
 
             }
             DeckModel newDeck = await _service.NewDeck();
@@ -92,7 +92,7 @@ namespace BlackJack.Controllers
             {
                 DeckModel cardsResult = await _service.DrawCards(1, status.DeckId);
                 status.PlayerCards.Add(cardsResult.cards[0]);
-                status.PlayerScore += GetHandScore(status.PlayerCards);
+                status.PlayerScore = GetHandScore(status.PlayerCards);
                 if(status.PlayerScore > 21)
                 {
                     status.GameOver = true;
@@ -106,14 +106,14 @@ namespace BlackJack.Controllers
                 {
                 DeckModel cardsResult = await _service.DrawCards(1, status.DeckId);
                 status.DealerCards.Add(cardsResult.cards[0]);
-                status.DealerScore += GetHandScore(status.DealerCards);
+                status.DealerScore = GetHandScore(status.DealerCards);
                 }
                 //status.GameOver = true;
-                if(status.PlayerScore == 21 && status.DealerScore != 21 || status.PlayerScore > status.DealerScore)
+                if(status.DealerScore > 21 || (status.PlayerScore > status.DealerScore && status.DealerScore <= 21 && status.PlayerScore <= 21))
                 {
                     status.Outcome = "Win";
                 }
-                else if(status.PlayerScore != 21 && status.DealerScore == 21 || status.PlayerScore < status.DealerScore)
+                else if(status.DealerScore <= 21 && status.PlayerScore < status.DealerScore)
                 {
                     status.Outcome = "Loss";
                 }
